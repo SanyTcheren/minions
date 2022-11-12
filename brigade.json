@@ -1,0 +1,30 @@
+[
+    {
+        "number": "91",
+        "place": {
+            "field": "Усть-Балыкское",
+            "bush": "162",
+            "customer": "ООО РН-Юганскнефтегаз"
+        },
+        "rig": {
+            "type": "Уралмаш БУ 5000/320 ЭК-БМЧ",
+            "number": "14938"
+        },
+        "dps": [
+            {
+                "garage_number": "40224",
+                "factory_number": "0298",
+                "manufacturer": "Doosan",
+                "type": "D550D5",
+                "year": "2019",
+                "power": 400,
+                "voltage": 400,
+                "current": null,
+                "purpose": "аварийная",
+                "tank": 700,
+                "consumption": 119,
+                "general": 284
+            }
+        ]
+    }
+]
