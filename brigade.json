@@ -25,6 +25,18 @@
                 "consumption": 119,
                 "general": 284
             }
+        ],
+        "meter": [
+            {
+                "number": "0816190453",
+                "type": "СЭТ-4ТМ.03М.01",
+                "multiplier": 7200,
+                "value": {
+                    "day": "2022-11-13T15:51:00",
+                    "active": 1625.45,
+                    "reactive":690.62
+                }
+            }
         ]
     }
 ]

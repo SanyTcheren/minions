@@ -40,6 +40,10 @@ DROP TABLE IF EXISTS Category;
 DROP TABLE IF EXISTS Location;
 DROP TABLE IF EXISTS Works;
 DROP TABLE IF EXISTS Maintenance;
+DROP TABLE IF EXISTS Meter;
+DROP TABLE IF EXISTS Value;
+DROP TABLE IF EXISTS Well;
+DROP TABLE IF EXISTS Energy30min;
 CREATE TABLE Field (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
     name TEXT UNIQUE,
@@ -79,7 +83,7 @@ CREATE TABLE Dps (
 CREATE TABLE Runtime (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
     dps_id INT NOT NULL,
-    date TEXT NOT NULL,
+    day TEXT NOT NULL,
     general INT NOT NULL,
     daily INT,
     notes TEXT
@@ -117,6 +121,34 @@ CREATE TABLE Maintenance (
     location_id INT NOT NULL,
     works_id INT NOT NULL,
     brigade_id INT NOT NULL
+);
+CREATE TABLE Meter (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+    number TEXT NOT NULL,
+    type TEXT NOT NULL,
+    multiplier INT NOT NULL,
+    brigade_id INT NOT NULL
+);
+CREATE TABLE Value (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+    meter_id INT NOT NULL,
+    day TEXT NOT NULL,
+    active REAL NOT NULL,
+    reactive REAL NOT NULL
+);
+CREATE TABLE Well (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+    number TEXT NOT NULL UNIQUE,
+    brigade_id INT NOT NULL,
+    start TEXT NOT NULL,
+    end TEXT
+);
+CREATE TABLE Energy30min (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+    well_id INT NOT NULL,
+    day TEXT NOT NULL,
+    active REAL,
+    reactive REAL
 );
                      """
 )
@@ -232,9 +264,29 @@ dps_id = cursor.fetchone()[0]
 today = date.today()
 general = brigade_data[0]["dps"][0]["general"]
 cursor.execute(
-    """INSERT OR REPLACE INTO Runtime (dps_id, date, general, daily, notes)
+    """INSERT OR REPLACE INTO Runtime (dps_id, day, general, daily, notes)
     VALUES (?, ?, ?, ?, ?)""",
     (dps_id, today, general, 0, ""),
+)
+
+meter_number = brigade_data[0]["meter"][0]["number"]
+meter_type = brigade_data[0]["meter"][0]["type"]
+multiplier = brigade_data[0]["meter"][0]["multiplier"]
+cursor.execute(
+    "INSERT INTO Meter (number, type, multiplier, brigade_id) VALUES (?, ?, ?, ?)",
+    (meter_number, meter_type, multiplier, brigade_id),
+)
+cursor.execute(
+    "SELECT id FROM Meter WHERE number = ? AND type = ?", (meter_number, meter_type)
+)
+meter_id = cursor.fetchone()[0]
+
+value_date = brigade_data[0]["meter"][0]["value"]["day"]
+value_active = brigade_data[0]["meter"][0]["value"]["active"]
+value_reactive = brigade_data[0]["meter"][0]["value"]["reactive"]
+cursor.execute(
+    "INSERT INTO Value (meter_id, day, active, reactive) VALUES (?, ?, ?, ?)",
+    (meter_id, value_date, value_active, value_reactive),
 )
 
 connection.commit()
@@ -313,3 +365,5 @@ for row in jdata:
 
     log_dict = {"ts": time.time(), "message": f"add {row[0]} in table Worker"}
     logger.info(json.dumps(log_dict))
+
+    connection.close()
