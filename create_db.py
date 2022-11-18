@@ -149,7 +149,8 @@ CREATE TABLE Energy (
     start TEXT NOT NULL,
     end TEXT NOT NULL,
     active REAL,
-    reactive REAL
+    reactive REAL,
+    UNIQUE(meter_id, start, end)
 );
                      """
 )
