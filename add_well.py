@@ -40,7 +40,7 @@ while True:
     if well_number != "":
         break
     else:
-        print("It's not ISO 8601, try again")
+        print("It's impossible number, try again")
 
 while True:
     start = input("Enter start time for well (use ISO 8601):")
